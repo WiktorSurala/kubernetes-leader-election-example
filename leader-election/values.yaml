@@ -1,0 +1,4 @@
+replicaCount: 3
+image:
+  repository: "localhost:5000/leader-election:latest"
+  pullPolicy: Always

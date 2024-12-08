@@ -1,0 +1,85 @@
+= Kubernetes Leader Election Example
+:toc: left
+:toclevels: 2
+:icons: font
+:sectnums:
+
+== Introduction
+
+This project demonstrates a leader election mechanism for microservices running on Kubernetes.
+It ensures that only one instance of a service acts as the leader at any given time, using Kubernetes' native capabilities and Spring Cloud.
+
+== Prerequisites
+
+To test this example, you need:
+* A Kubernetes cluster (e.g., Minikube).
+* Docker installed on your machine.
+* Helm installed for Kubernetes package management.
+
+If you're using Minikube, you also need a container registry.
+Enable the registry addon with:
+
+```
+minikube addons enable registry
+```
+
+For Windows users, run the following command to configure the registry:
+
+```
+docker run --rm -it --network=host alpine ash -c "apk add socat && socat TCP-LISTEN:5000,reuseaddr,fork TCP:$(minikube ip):5000"
+```
+
+== Setup Instructions
+
+=== Step 1: Build and Push Docker Image
+
+A `build.bat` script is provided to simplify the image creation and pushing process.
+Run the script:
+
+```
+build.bat
+```
+
+This will:
+1. Build the Docker image for the application.
+2. Push the image to the Minikube registry.
+
+=== Step 2: Deploy the Application
+
+A Helm chart is provided to deploy the application on Kubernetes.
+Use the provided `deploy.bat` script to uninstall any existing deployment and install the latest version:
+
+```
+deploy.bat
+```
+
+Alternatively, you can deploy manually with Helm:
+
+```
+helm install leader-election ./leader-election
+```
+
+== How It Works
+
+The application uses Kubernetes' native mechanisms to coordinate leadership election among pods.
+* The leader is determined based on the configuration in the Helm chart.
+* Spring Cloud Kubernetes manages the leadership logic.
+
+== Testing
+
+To verify that the application is functioning correctly:
+1. Access the `/status` endpoint of any pod to see if it is the current leader.
+2. Use the Kubernetes dashboard or `kubectl logs` to monitor logs and confirm leadership transitions.
+
+== Troubleshooting
+
+For common issues:
+* Ensure the Docker image is pushed to the Minikube registry.
+* Verify the `leader-election-sa` service account has appropriate RBAC permissions in Kubernetes.
+
+Refer to the `HELP.md` file for additional guidance.
+
+== License
+
+This project is released under the MIT License.
+Feel free to use and modify it for your purposes.
